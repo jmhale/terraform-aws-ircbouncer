@@ -6,7 +6,7 @@ Terraform module to deploy a IRC bouncer (ZNC) on AWS
 
 ```
 module "terraform-aws-ircbouncer" {
-  source                    = "github.com/jmhale/terraform-aws-ircbouncer"
+  source = "git@github.com:jmhale/terraform-aws-ircbouncer.git"
 }
 
 ```
