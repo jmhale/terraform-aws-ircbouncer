@@ -51,19 +51,19 @@ resource "aws_instance" "irc-bouncer-instance" {
 
   user_data = <<EOF
 #!/bin/bash
-sudo apt-get update
-sudo apt-get install -y znc znc-dev software-properties-common
-sudo add-apt-repository -y ppa:certbot/certbot
-sudo apt-get update
-sudo useradd --create-home -d /var/lib/znc --system --shell /sbin/nologin --comment "Account to run ZNC daemon" --user-group znc
-sudo apt-get install -y certbot awscli
+apt-get update
+apt-get upgrade -y
+add-apt-repository -y ppa:certbot/certbot
+apt-get update
+apt-get install -y znc znc-dev software-properties-common certbot awscli
+useradd --create-home -d /var/lib/znc --system --shell /sbin/nologin --comment "Account to run ZNC daemon" --user-group znc
 # Drop in a systemd unit for ZNC, since it doesn't come with one by default
 echo W1VuaXRdCkRlc2NyaXB0aW9uPVpOQywgYW4gYWR2YW5jZWQgSVJDIGJvdW5jZXIKQWZ0ZXI9bmV0d29yay1vbmxpbmUudGFyZ2V0CgpbU2VydmljZV0KRXhlY1N0YXJ0PS91c3IvYmluL3puYyAtZiAtLWRhdGFkaXI9L3Zhci9saWIvem5jClVzZXI9em5jCgpbSW5zdGFsbF0KV2FudGVkQnk9bXVsdGktdXNlci50YXJnZXQK | base64 --decode > /etc/systemd/system/znc.service
 systemctl daemon-reload
 aws s3 sync s3://dogsec-build-artifacts/znc/ /var/lib/znc/
 chown -R znc:znc /var/lib/znc/*
-sudo certbot certonly --standalone -d irc.dogsec.io -m dog@dogsec.io --agree-tos -n
-sudo cat /etc/letsencrypt/live/irc.dogsec.io/privkey.pem /etc/letsencrypt/live/irc.dogsec.io/fullchain.pem > /var/lib/znc/configs/irc.dogsec.io.pem
+certbot certonly --standalone -d irc.dogsec.io -m dog@dogsec.io --agree-tos -n
+cat /etc/letsencrypt/live/irc.dogsec.io/privkey.pem /etc/letsencrypt/live/irc.dogsec.io/fullchain.pem > /var/lib/znc/configs/irc.dogsec.io.pem
 systemctl enable znc
 systemctl start znc
 # Overwrite default certbot cron file with ours that includes renewal hooks for ZNC restart
