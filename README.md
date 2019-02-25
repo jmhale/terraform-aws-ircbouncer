@@ -26,8 +26,5 @@ module "terraform-aws-ircbouncer" {
 |`irc_eip`|The public IPv4 address of the AWS Elastic IP assigned to the instance.|
 
 
-LICENSE: 3-clause BSD license.
-
-
 ---
 Copyright © 2019, James Hale
