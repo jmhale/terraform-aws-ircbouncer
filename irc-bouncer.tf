@@ -1,9 +1,9 @@
 resource "aws_security_group" "irc-instance-sg" {
   name        = "irc-instance-sg"
   description = "Terraform Managed. SG for IRC bouncer instance."
-  vpc_id      = "${var.vpc_id}"
+  vpc_id      = var.vpc_id
 
-  tags {
+  tags = {
     Name       = "irc-instance-sg"
     Project    = "irc"
     tf-managed = "True"
@@ -42,12 +42,12 @@ resource "aws_security_group" "irc-instance-sg" {
 }
 
 resource "aws_instance" "irc-bouncer-instance" {
-  ami                    = "${var.ami_id}"
+  ami                    = var.ami_id
   instance_type          = "t2.nano"
-  key_name               = "${var.ssh_key_id}"
-  subnet_id              = "${var.public_subnet_ids[0]}"
-  vpc_security_group_ids = ["${aws_security_group.irc-instance-sg.id}", "${var.ingress_security_group_id}"]
-  iam_instance_profile   = "${aws_iam_instance_profile.ircbouncer_iamprofile_buildartifacts.name}"
+  key_name               = var.ssh_key_id
+  subnet_id              = var.public_subnet_ids[0]
+  vpc_security_group_ids = [aws_security_group.irc-instance-sg.id, var.ingress_security_group_id]
+  iam_instance_profile   = aws_iam_instance_profile.ircbouncer_iamprofile_buildartifacts.name
 
   user_data = <<EOF
 #!/bin/bash
@@ -70,7 +70,8 @@ systemctl start znc
 echo U0hFTEw9L2Jpbi9zaApQQVRIPS91c3IvbG9jYWwvc2JpbjovdXNyL2xvY2FsL2Jpbjovc2JpbjovYmluOi91c3Ivc2JpbjovdXNyL2JpbgoKMCAqLzEyICogKiAqIHJvb3QgdGVzdCAteCAvdXNyL2Jpbi9jZXJ0Ym90IC1hIFwhIC1kIC9ydW4vc3lzdGVtZC9zeXN0ZW0gJiYgcGVybCAtZSAnc2xlZXAgaW50KHJhbmQoMzYwMCkpJyAmJiAvdXNyL2Jpbi9jZXJ0Ym90IC1xIHJlbmV3IC0tcmVuZXctaG9vayAiY2F0IC9ldGMvbGV0c2VuY3J5cHQvbGl2ZS9pcmMuZG9nc2VjLmlvL3ByaXZrZXkucGVtIC9ldGMvbGV0c2VuY3J5cHQvbGl2ZS9pcmMuZG9nc2VjLmlvL2Z1bGxjaGFpbi5wZW0gPiAvdmFyL2xpYi96bmMvY29uZmlncy9pcmMuZG9nc2VjLmlvLnBlbSIgLS1yZW5ldy1ob29rICJzeXN0ZW1jdGwgcmVzdGFydCB6bmMi | base64 --decode > /etc/cron.d/certbot
 EOF
 
-  tags {
+
+  tags = {
     Name       = "irc-bouncer"
     Project    = "irc"
     tf-managed = "True"
@@ -78,6 +79,7 @@ EOF
 }
 
 resource "aws_eip" "irc_eip" {
-  instance = "${aws_instance.irc-bouncer-instance.id}"
+  instance = aws_instance.irc-bouncer-instance.id
   vpc      = true
 }
+

@@ -36,23 +36,24 @@ data "aws_iam_policy_document" "ec2-assume-role" {
 resource "aws_iam_policy" "ircbouncer_iampol_buildartifacts" {
   name        = "tf-ircbouncer-access-build-artifacts"
   description = "Terraform Managed. Allows IRC bouncer to access build artifacts."
-  policy      = "${data.aws_iam_policy_document.ircbouncer_iampoldoc_buildartifacts.json}"
+  policy      = data.aws_iam_policy_document.ircbouncer_iampoldoc_buildartifacts.json
 }
 
 resource "aws_iam_role" "ircbouncer_iamrole_buildartifacts" {
   name               = "tf-ircbouncer-access-build-artifacts"
   description        = "Terraform Managed. Allows IRC bouncer to access build artifacts."
   path               = "/"
-  assume_role_policy = "${data.aws_iam_policy_document.ec2-assume-role.json}"
+  assume_role_policy = data.aws_iam_policy_document.ec2-assume-role.json
 }
 
 resource "aws_iam_policy_attachment" "ircbouncer_iampolattach_buildartifacts" {
   name       = "ircbouncer_iampolattach_buildartifacts"
-  roles      = ["${aws_iam_role.ircbouncer_iamrole_buildartifacts.name}"]
-  policy_arn = "${aws_iam_policy.ircbouncer_iampol_buildartifacts.arn}"
+  roles      = [aws_iam_role.ircbouncer_iamrole_buildartifacts.name]
+  policy_arn = aws_iam_policy.ircbouncer_iampol_buildartifacts.arn
 }
 
 resource "aws_iam_instance_profile" "ircbouncer_iamprofile_buildartifacts" {
   name = "tf-ircbouncer-access-build-artifacts"
-  role = "${aws_iam_role.ircbouncer_iamrole_buildartifacts.name}"
+  role = aws_iam_role.ircbouncer_iamrole_buildartifacts.name
 }
+
